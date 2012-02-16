@@ -12,7 +12,7 @@ class AccessFilters {
         if(session?.roles == null) {
 
           //TODO: Get stuff from config
-          def entitlements = request.getHeader("entitlement")?.split(";")
+          def entitlements = request.getAttribute("entitlement")?.split(";")
 
           session?.roles = entitlements?.collect { entitlement ->
             AccessRole.findByUri(entitlement)
