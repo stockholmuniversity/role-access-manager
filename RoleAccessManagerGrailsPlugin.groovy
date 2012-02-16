@@ -6,7 +6,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 class RoleAccessManagerGrailsPlugin {
   // the plugin version
-  def version = "0.1.0"
+  def version = "0.2.0"
   // the version or versions of Grails the plugin is designed for
   def grailsVersion = "2.0 > *"
   // the other plugins this plugin depends on
@@ -58,21 +58,6 @@ Grails plugin to manage role access.
   }
 
   def doWithApplicationContext = { applicationContext ->
-
-    def access = [:]
-
-    access[AccessRole.SYSADMIN] = [
-            'access'
-    ]
-
-    def accessService = applicationContext.getBean('accessService')
-
-    access.each { role, controllers ->
-      controllers.each { controller ->
-        accessService.addAccess(role, controller)
-      }
-
-    }
   }
 
   def onChange = { event ->

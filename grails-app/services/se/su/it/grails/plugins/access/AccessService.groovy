@@ -6,12 +6,14 @@ class AccessService {
   static transactional = true
 
   def hasAccess(AccessRole role, String controller) {
-    return RoleControllerAccess.findByController(controller)?.roles?.contains(role)
+    RoleControllerAccess roleControllerAccess = RoleControllerAccess.findByController controller
+
+    roleControllerAccess?.roles?.contains(role) ?: false
   }
-  
+
   def hasAccess(Collection<AccessRole> roles, String controller) {
     boolean access = false
-    
+
     roles.each { role ->
       if ( hasAccess(role, controller) )
         access = true
@@ -63,15 +65,15 @@ class AccessService {
 
     if(!roleControllerAccess.save()) {
       throw new RuntimeException(
-          "Unable to save ControllerAccess ${controller} for role ${role}, failed with error: ${roleControllerAccess?.errors?.allErrors?.join(',')}"
+              "Unable to save ControllerAccess ${controller} for role ${role}, failed with error: ${roleControllerAccess?.errors?.allErrors?.join(',')}"
       )
     }
   }
-  
+
   List<String> getUnprotectedControllers() {
-    grailsApplication.config.access.unprotected ?: ['access']   
+    grailsApplication.config.access.unprotected ?: []
   }
-  
+
   LinkedHashMap<String, String> getRedirect() {
     grailsApplication.config.access.redirect ?: [uri: '/']
   }

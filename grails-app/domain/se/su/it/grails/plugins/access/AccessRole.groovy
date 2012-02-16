@@ -1,20 +1,22 @@
 package se.su.it.grails.plugins.access
 
-enum AccessRole {
-
-  SYSADMIN("System Administrator", "urn:mace:swami.se:gmai:su-timeedittool:sysadmin")
+class AccessRole {
 
   String displayName
   String uri
 
-  AccessRole(String displayName, String uri) {
-    this.displayName = displayName
-    this.uri = uri
+  static constraints = {
+    displayName(nullable: false, unique: false)
+    uri(nullable: false, unique: true)
   }
 
-  static AccessRole findByUri(String uri) {
-    AccessRole.values().find { accessRole ->
-      accessRole.uri == uri
-    }
+  @Override
+  boolean equals(Object o) {
+    if (!o instanceof AccessRole)
+      return super.equals()
+
+    AccessRole accessRole = (AccessRole) o
+
+    this.uri == accessRole.uri
   }
 }

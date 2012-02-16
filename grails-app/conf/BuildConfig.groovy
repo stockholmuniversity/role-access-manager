@@ -4,7 +4,7 @@ grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
-grails.plugin.repos.distribution.suGrailsPlugins = "file:///afs/su.se/services/svn/grails-plugins/trunk/"
+grails.plugin.repos.distribution.suGrailsPlugins = 'svn+ssh://svn.it.su.se/svn/grails-plugins/trunk/'
 grails.plugin.repos.discovery.suGrailsPlugins = "http://svn.it.su.se/grails-plugins/trunk/"
 
 grails.project.dependency.resolution = {
