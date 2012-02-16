@@ -13,10 +13,10 @@ class AccessTagLib {
     if (accessService.hasAccess(roles, controller))
       out << body()
   }
-  
+
   def renderAccessMatrix = { attrs ->
     String controller = attrs?.controller ?: null
-    AccessRole role = attrs?.role
+    AccessRole role = AccessRole.findById attrs?.role
     def systemRole = RoleControllerAccess.findByController(controller)
 
     if (role && controller) {

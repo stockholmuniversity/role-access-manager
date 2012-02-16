@@ -5,11 +5,11 @@ class AccessController {
   def accessService
 
   def index = {
-    [roles:AccessRole.values()]
+    [roles:AccessRole.all]
   }
 
   def toggleAccess = {
-    AccessRole role = params?.role
+    AccessRole role = AccessRole.findById params?.role
     def targetController = params?.cntrl
 
     if (!role) {

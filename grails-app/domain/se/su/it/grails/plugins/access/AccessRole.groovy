@@ -5,9 +5,20 @@ class AccessRole {
   String displayName
   String uri
 
+  static mapping = {
+    cache true
+  }
+
   static constraints = {
     displayName(nullable: false, unique: false)
     uri(nullable: false, unique: true)
+  }
+
+  @Override
+  int hashCode() {
+    int result = 17
+    result = 31 * result + uri.hashCode()
+    result
   }
 
   @Override
