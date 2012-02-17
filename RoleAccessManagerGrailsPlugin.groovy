@@ -38,7 +38,10 @@ Grails plugin to manage role access.
   def organization = [ name: "Stockholm University", url: "http://www.su.se/" ]
 
   // Any additional developers beyond the author specified above.
-  def developers = [ [ name: "Tommy Andersson", email: "tommy.andersson@su.se" ]]
+  def developers = [
+          [ name: "Tommy Andersson", email: "tommy.andersson@su.se" ],
+          [ name: "Jan Qvarnström", email: "jan.qvarnstrom@su.se"]
+  ]
 
   // Location of the plugin's issue tracker.
 //    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]

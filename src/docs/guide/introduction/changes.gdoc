@@ -1,0 +1,4 @@
+h3. v0.2.2 - February 17th. 2012
+
+  * First usable version.
+  * Fetches entitlements (roles) from request attributes (env)

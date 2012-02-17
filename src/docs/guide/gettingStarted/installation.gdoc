@@ -1,0 +1,13 @@
+# The plugin is published in the Stockholm University grails plugins repository. Add it to your BuildConfig.groovy:
+{code}
+repositories {
+  ...
+
+  grailsRepo "http://svn.it.su.se/grails-plugins/"
+
+  ...
+}
+{code}
+
+# Install the plugin
+{code}grails install-plugin role-access-manager{code}

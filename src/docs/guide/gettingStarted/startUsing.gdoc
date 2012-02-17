@@ -1,0 +1,10 @@
+The plugin comes with a controller for dynamic access control. Its called [controller:access] and you can use it as
+soon as you let one of your roles access it.
+
+h3. Access TagLib
+Included in the plugin is a taglib containing some useful tags. Example:
+{code}
+<access:hasAccess controller="access">
+  <li class="controller"><g:link controller="access"><g:message code="generic.access"/></g:link></li>
+</access:hasAccess>
+{code}

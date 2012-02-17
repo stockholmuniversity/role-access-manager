@@ -1,0 +1,23 @@
+# Congratulations! you have successfully locked down your whole application.
+Now you are all set up for role based access control. Lets create some roles:
+
+## To gain access to your application the first thing you need is a role. You create roles by saving [domain:AccesRole]s
+to your database. Example:
+{code}
+  AccessRole sysadmin = new AccessRole(
+    displayName: "System Administrator",
+    uri: "urn:mace:swami.se:gmai:su-timeedittool:sysadmin"
+  )
+  sysadmin.save()
+{code}
+## You have now created a role, but it still can't access anything. Use the "accessService.addAccess(role, controller)"
+method to give access to your role. Example:
+{code}
+  accessService.addAccess(sysadmin, 'foo')
+{code}
+where sysadmin is the role you created earlier and 'foo' is the name of the controller you allow access to.
+
+# Configure your Idp to release your roles in GMAI urn format.
+
+# Configure your Sp's attribute map to get the roles in a request attribute named "entitlement".
+

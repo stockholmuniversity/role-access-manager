@@ -1,0 +1,11 @@
+introduction:
+  title: Introduction
+  changes: Change Log
+gettingStarted:
+  title: Getting Started
+  installation: Installation
+  initialSetup: Initial Setup
+  startUsing: Start using the plugin
+configuration:
+  title: Configuration
+  options: Options
