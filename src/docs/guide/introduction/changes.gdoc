@@ -1,4 +1,6 @@
-h3. v0.2.2 - February 17th. 2012
+h3. v0.2.3 - February 17th. 2012
+  * Added some doc.
 
+h3. v0.2.2 - February 16th. 2012
   * First usable version.
   * Fetches entitlements (roles) from request attributes (env)
