@@ -1,3 +1,9 @@
+h3. v0.2.5 - February 20th. 2012
+  * Documentation
+
+h3. v0.2.4 - February 20th. 2012
+  * Added config option to disable controllers in dynamic access view
+
 h3. v0.2.3 - February 17th. 2012
   * Added some doc.
 
