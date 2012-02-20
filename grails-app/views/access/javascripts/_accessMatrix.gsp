@@ -1,6 +1,6 @@
 <script type="text/javascript">
   $(function() {
-    $('input[name$=_section],input[name$=_access],input[name$=_value],input[name$=_dashboard],input[name$=_error],input[name$=_selenium]').attr('disabled', true);
+    //$('input[name$=_section],input[name$=_access],input[name$=_value],input[name$=_dashboard],input[name$=_error],input[name$=_selenium]').attr('disabled', true);
 
     $(':checkbox').change(function(event) {
       event.preventDefault();

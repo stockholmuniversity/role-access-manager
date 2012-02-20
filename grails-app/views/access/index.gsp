@@ -9,7 +9,7 @@
 
   <body>
     <h1><g:message code="views.access.index.title"/></h1>
-    <g:link controller="dashboard" action="index" class="apps-add-bullet-back">Tillbaka</g:link>
+    <g:link controller="dashboard" action="index" class="apps-add-bullet-back"><g:message code="generic.back"/></g:link>
     <div class="feedbackMsgs"></div>
     <div class="apps-float-80">
       <div class="apps-content-block-inner">
