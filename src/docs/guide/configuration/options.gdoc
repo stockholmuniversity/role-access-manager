@@ -1,0 +1,18 @@
+An example configuration could look like this:
+{code}
+access {
+  redirect = [controller: 'dashboard']
+  unprotected = ['dashboard']
+  disabledInDynamicAccess = ['dashboard', 'access']
+}
+{code}
+
+h3. Redirect
+The redirect option tells the plugin where to redirect users upon unauthorized access. The value is a map used to build
+a link.
+
+h3. Unprotected
+A list of controllers with unrestricted access.
+
+h3. Controllers disabled in dynamic access view
+A list of controllers that should be disabled in the dynamic access view.
