@@ -6,6 +6,7 @@ grails.project.target.level = 1.6
 
 grails.plugin.repos.distribution.suGrailsPlugins = 'svn+ssh://svn.it.su.se/svn/grails-plugins/trunk/'
 grails.plugin.repos.discovery.suGrailsPlugins = "http://svn.it.su.se/grails-plugins/trunk/"
+grails.plugin.repos.default = "suGrailsPlugins"
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -16,14 +17,6 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenCentral()
-        //mavenLocal()
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
