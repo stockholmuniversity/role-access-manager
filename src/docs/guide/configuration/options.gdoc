@@ -1,11 +1,16 @@
 An example configuration could look like this:
 {code}
 access {
+  env = 'dev'
   redirect = [controller: 'dashboard']
   unprotected = ['dashboard']
   disabledInDynamicAccess = ['dashboard', 'access']
 }
 {code}
+
+h3. Env
+Matches applications scope to users supplied scope through entitlements.
+Can be either dev, prod or test.
 
 h3. Redirect
 The redirect option tells the plugin where to redirect users upon unauthorized access. The value is a map used to build
