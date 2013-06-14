@@ -7,13 +7,13 @@ class RoleControllerAccess {
   static hasMany = [roles: AccessRole]
 
   static mapping = {
-    controller lazy:false
     cache true
+    roles batchSize: 10
   }
 
   static constraints = {
-    roles(nullable:true, blank:true, unique:false)
-    controller(unique: true, nullable:false, blank: false)
+    roles(nullable:true)
+    controller(nullable:false, blank: false, unique: true)
   }
 
   String toString() {

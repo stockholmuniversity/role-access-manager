@@ -3,15 +3,14 @@ package se.su.it.grails.plugins.access
 class AccessService {
 
   def grailsApplication
-  static transactional = true
 
-  def hasAccess(AccessRole role, String controller) {
+  public hasAccess(AccessRole role, String controller) {
     RoleControllerAccess roleControllerAccess = RoleControllerAccess.findByController controller
 
     roleControllerAccess?.roles?.contains(role) ?: false
   }
 
-  def hasAccess(Collection<AccessRole> roles, String controller) {
+  public hasAccess(Collection<AccessRole> roles, String controller) {
     boolean access = false
 
     roles.each { role ->
@@ -70,11 +69,14 @@ class AccessService {
     }
   }
 
-  List<String> getUnprotectedControllers() {
+  public List<String> getUnprotectedControllers() {
     grailsApplication.config.access.unprotected ?: []
   }
 
-  LinkedHashMap<String, String> getRedirect() {
+  public LinkedHashMap<String, String> getRedirect() {
     grailsApplication.config.access.redirect ?: [uri: '/']
+  }
+  public String getScopedEnvironment() {
+    (grailsApplication.config.access.env)?:'dev'
   }
 }

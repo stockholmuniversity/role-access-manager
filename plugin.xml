@@ -1,0 +1,26 @@
+<plugin name='role-access-manager' version='0.2.6.8' grailsVersion='2.0 &gt; *'>
+  <author>Joakim Lundin</author>
+  <authorEmail>joakim.lundin@su.se</authorEmail>
+  <title>Role Access Manager Plugin</title>
+  <description>Grails plugin to manage role access.
+</description>
+  <type>RoleAccessManagerGrailsPlugin</type>
+  <resources>
+    <resource>se.su.it.grails.plugins.access.AccessController</resource>
+    <resource>se.su.it.grails.plugins.access.AccessRole</resource>
+    <resource>se.su.it.grails.plugins.access.RoleControllerAccess</resource>
+    <resource>se.su.it.grails.plugins.access.AccessService</resource>
+    <resource>se.su.it.grails.plugins.access.AccessTagLib</resource>
+  </resources>
+  <repositories>
+    <repository name='grailsCentral' url='http://plugins.grails.org' />
+    <repository name='http://repo.grails.org/grails/plugins' url='http://repo.grails.org/grails/plugins/' />
+    <repository name='http://repo.grails.org/grails/core' url='http://repo.grails.org/grails/core/' />
+    <repository name='grailsCore' url='http://svn.codehaus.org/grails/trunk/grails-plugins' />
+    <repository name='mavenCentral' url='http://repo1.maven.org/maven2/' />
+  </repositories>
+  <dependencies />
+  <plugins />
+  <runtimePluginRequirements />
+  <behavior />
+</plugin>
