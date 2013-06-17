@@ -4,9 +4,10 @@ grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
-grails.plugin.repos.distribution.suGrailsPlugins = 'svn+ssh://svn.it.su.se/svn/grails-plugins/trunk/'
-grails.plugin.repos.discovery.suGrailsPlugins = "http://svn.it.su.se/grails-plugins/trunk/"
-grails.plugin.repos.default = "suGrailsPlugins"
+grails.plugin.repos.distribution.suGrailsPlugins = "svn+ssh://svn.it.su.se/svn/grails-plugins/"
+grails.plugin.repos.discovery.suGrailsPlugins = "http://svn.it.su.se/grails-plugins/"
+grails.project.repos.default = 'suGrailsPlugins'
+grails.release.scm.enabled = false
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -25,9 +26,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":tomcat:$grailsVersion",
-              ":release:1.0.0") {
-            export = false
+        build ":tomcat:$grailsVersion", ':release:2.2.1', ':rest-client-builder:1.0.3', {
+          export = false
         }
     }
 }

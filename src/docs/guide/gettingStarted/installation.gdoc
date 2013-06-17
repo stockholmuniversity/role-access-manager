@@ -10,4 +10,14 @@ repositories {
 {code}
 
 # Install the plugin
-{code}grails install-plugin role-access-manager{code}
+Add the following to your BuildConfig.groovy
+{code}
+  plugins {
+    ...
+
+    runtime ':role-access-manager:version'
+
+    ...
+  }
+
+{code}
