@@ -28,7 +28,20 @@ class AccessFilters {
 
           String scopedEnvironment = accessService.scopedEnvironment
 
-          session?.roles = entitlements?.collect { String entitlement ->
+          /** Remove all entitlements that do not correspond to the current application scope. */
+          def scopedEntitlements = entitlements.grep { String entitlement ->
+            entitlement ==~ /.*[,|:]env=${scopedEnvironment}.*/
+          }
+
+          if (!entitlements) {
+            log.error "No valid entitlements found for scoped environment ${scopedEnvironment}"
+            log.info "${request?.eppn} has the following entitlements."
+            entitlements.eachWithIndex { entitlement, index ->
+              log.info "${index}. $entitlement"
+            }
+          }
+
+          session?.roles = scopedEntitlements?.collect { String entitlement ->
             try {
 
               String base = AccessRole.getBaseFromUri(entitlement)

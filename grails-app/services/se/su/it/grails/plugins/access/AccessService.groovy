@@ -50,16 +50,12 @@ class AccessService {
       throw new IllegalArgumentException()
     }
 
-    Boolean toggledTo = null
-
     RoleControllerAccess roleControllerAccess = RoleControllerAccess.findOrCreateWhere(controller: controller)
 
     if (roleControllerAccess.roles?.contains(role)) {
       roleControllerAccess.removeFromRoles(role)
-      toggledTo = false
     } else {
       roleControllerAccess.addToRoles(role)
-      toggledTo = true
     }
 
     if(!roleControllerAccess.save()) {
@@ -76,6 +72,7 @@ class AccessService {
   public LinkedHashMap<String, String> getRedirect() {
     grailsApplication.config.access.redirect ?: [uri: '/']
   }
+
   public String getScopedEnvironment() {
     (grailsApplication.config.access.env)?:'dev'
   }

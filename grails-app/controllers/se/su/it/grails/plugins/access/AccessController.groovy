@@ -5,7 +5,8 @@ class AccessController {
   def accessService
 
   def index = {
-    [roles:AccessRole.all]
+    def env = accessService.scopedEnvironment
+    return render(view:'index', model:[roles:AccessRole.findAllByEnv(env)])
   }
 
   def toggleAccess = {

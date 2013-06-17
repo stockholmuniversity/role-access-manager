@@ -3,8 +3,8 @@
   <head>
     <title><g:message code="views.access.index.title"/></title>
     <meta name="layout" content="main"/>
-    <r:require module="core"/>
-    <r:require module="jquery"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="${g.resource(dir:'js/access', file:'matrix.js')}"></script>
   </head>
 
   <body>
@@ -17,7 +17,6 @@
           <g:render template="accessMatrix" bean="accessInstance"/>
         </div>
       </div>
-
       <div class="clear-float"></div>
     </div>
   </body>

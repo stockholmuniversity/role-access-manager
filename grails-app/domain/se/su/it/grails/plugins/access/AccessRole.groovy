@@ -12,6 +12,7 @@ class AccessRole {
 
   static mapping = {
     cache true
+    version false // We don't seem to care about optimistic locking anyways.
   }
 
   static constraints = {

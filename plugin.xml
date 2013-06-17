@@ -1,4 +1,4 @@
-<plugin name='role-access-manager' version='0.2.6' grailsVersion='2.0 &gt; *'>
+<plugin name='role-access-manager' version='0.2.6.1' grailsVersion='2.0 &gt; *'>
   <author>Joakim Lundin</author>
   <authorEmail>joakim.lundin@su.se</authorEmail>
   <title>Role Access Manager Plugin</title>
