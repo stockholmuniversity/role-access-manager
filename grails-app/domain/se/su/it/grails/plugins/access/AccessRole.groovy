@@ -18,7 +18,7 @@ class AccessRole {
   static constraints = {
     base(nullable: false, blank: false, unique:'env')
     displayName(nullable: false, blank: false)
-    env(inList: ['dev', 'prod', 'test'], blank: false)
+    env(blank: false)
     uri(nullable: false, blank: false, unique: true)
   }
 

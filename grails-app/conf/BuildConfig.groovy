@@ -2,12 +2,10 @@ grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.6
-//grails.project.war.file = "target/${appName}-${appVersion}.war"
 
-grails.plugin.repos.distribution.suGrailsPlugins = "svn+ssh://svn.it.su.se/svn/grails-plugins/"
-grails.plugin.repos.discovery.suGrailsPlugins = "http://svn.it.su.se/grails-plugins/"
-grails.project.repos.default = 'suGrailsPlugins'
-grails.release.scm.enabled = false
+grails.project.repos.default = 'su'
+grails.project.repos.su.url = "scpexe://git.it.su.se/afs/su.se/services/maven/it.su.se/maven2"
+grails.project.repos.su.type = "maven"
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -26,7 +24,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ":tomcat:$grailsVersion", ':release:2.2.1', ':rest-client-builder:1.0.3', {
+        build ':release:3.0.0', ':rest-client-builder:1.0.3', {
           export = false
         }
     }
