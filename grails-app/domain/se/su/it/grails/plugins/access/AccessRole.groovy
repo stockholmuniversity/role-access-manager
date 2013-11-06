@@ -20,13 +20,13 @@ class AccessRole {
     uri(nullable: false, blank: false, unique: true)
   }
 
-  public static AccessRole createOrUpdateInstance(String displayName, String role, Map scope) {
+  public static AccessRole createOrUpdateInstance(String displayName, String system, String role, Map scope) {
 
     if (!displayName) {
       throw new IllegalArgumentException("Display name is invalid '$displayName'")
     }
 
-    String uri = composeUri(role, scope)
+    String uri = composeUri(system, role, scope)
 
     withTransaction { status ->
       try {
@@ -38,14 +38,19 @@ class AccessRole {
     }
   }
 
-  private static String composeUri(String role, Map scope) {
+  private static String composeUri(String system, String role, Map scope) {
+    if (!system) {
+      throw new IllegalArgumentException("System name is invalid '$system'")
+    }
+
+
     if (!role) {
       throw new IllegalArgumentException("System name is invalid '$role'")
     }
 
     StringBuilder sb = new StringBuilder()
 
-    sb.append(BASE + role)
+    sb.append(BASE + system + ":" + role)
 
     scope?.each { k, v ->
       sb.append(":$k=$v")
