@@ -1,4 +1,6 @@
 target/
+plugin.xml
+*.sha1
 *.log
 .idea/
 *.ser

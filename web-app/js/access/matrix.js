@@ -22,6 +22,13 @@ $(function() {
     })
   }
 
+  $(".displayName").on("mouseover", function(event) {
+    var target$ = $("tr#roleInfo>th");
+    var val = $(this).data("urn");
+    target$.html(wrapMessage("Role uri: " + val));
+    return false
+  });
+
   $(':checkbox').change(function(event) {
     event.preventDefault();
     clickHandler( $(this) );

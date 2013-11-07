@@ -5,13 +5,12 @@ class AccessController {
   def accessService
 
   def index = {
-    def env = accessService.scopedEnvironment
-    return render(view:'index', model:[roles:AccessRole.findAllByEnv(env)])
+    return render(view:'index', model:[roles:AccessRole.list()])
   }
 
   def toggleAccess = {
-    AccessRole role = AccessRole.findById params?.role
-    def targetController = params?.cntrl
+    AccessRole role = AccessRole.findById(params.long("role"))
+    String targetController = params?.cntrl
 
     if (!role)
       return response.sendError(400,"${g.message(code:'controllers.access.toggleAccess.roleNotFound', args:[params?.role])}")

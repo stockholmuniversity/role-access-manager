@@ -3,9 +3,10 @@
   <tr>
     <th style="width:100px;"></th>
     <g:each in="${roles}" var="role">
-      <th>${role.displayName} (${role.env})</th>
+      <th data-urn="${role.uri}" class="displayName">${role.displayName}</th>
     </g:each>
   </tr>
+  <tr id="roleInfo"><th colspan="${roles?.size() + 1}" style="height: 25px;"></th></tr>
   </thead>
   <tbody>
   <g:each in="${grailsApplication.controllerClasses?.sort { it.shortName }}">

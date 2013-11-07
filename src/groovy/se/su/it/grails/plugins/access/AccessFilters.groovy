@@ -1,9 +1,12 @@
 package se.su.it.grails.plugins.access
 
 import grails.util.Environment
+import groovy.util.logging.Slf4j
 
+@Slf4j
 class AccessFilters {
 
+  def grailsApplication
   def accessService
 
   def filters = {
@@ -11,8 +14,11 @@ class AccessFilters {
     all(controller: '*', action: '*') {
       before = {
 
-        /** Add development mode. */
-        if (Environment.current == Environment.DEVELOPMENT && !(request?.eppn)) {
+        /** Add development & mock mode shibboleth bypass. */
+        if (
+            Environment.current.name in [Environment.DEVELOPMENT.name, "mock"]
+                && !(request?.eppn)) {
+          log.info "Missing eppn but environment $Environment.current.name allows shibboleth bypass, returning true."
           return true
         }
 
@@ -22,62 +28,19 @@ class AccessFilters {
           return true
         }
 
-        if (session?.roles == null) {
-          //TODO: Get stuff from config
-          def entitlements = request.getAttribute("entitlement")?.split(";")
+        String eppn = request.eppn
+        Set roleIds = session.rolesIds
 
-          String scopedEnvironment = accessService.scopedEnvironment
-
-          /** Remove all entitlements that do not correspond to the current application scope. */
-          def scopedEntitlements = entitlements.grep { String entitlement ->
-            entitlement ==~ /.*[,|:]env=${scopedEnvironment}.*/
-          }
-
-          if (!entitlements) {
-            log.error "No valid entitlements found for scoped environment ${scopedEnvironment}"
-            log.info "${request?.eppn} has the following entitlements."
-            entitlements.eachWithIndex { entitlement, index ->
-              log.info "${index}. $entitlement"
-            }
-          }
-
-          session?.roles = scopedEntitlements?.collect { String entitlement ->
-            try {
-
-              String base = AccessRole.getBaseFromUri(entitlement)
-              String env = AccessRole.getEnvFromUri(entitlement)
-
-              if (env != scopedEnvironment) {
-                log.debug "Environment is $env and scoped environment (set through config is $scopedEnvironment, skipping"
-                return null
-              }
-
-              return AccessRole.findByBaseAndEnv(base, env)
-            } catch (ex) {
-              log.error "Failed to parse ${entitlement}", ex
-              return null
-            }
-          }
-          session?.roles?.removeAll { it == null }
+        if (!roleIds) {
+          List entitlements = request.getAttribute("entitlement")?.split(";")
+          roleIds = accessService.getUserRolesIds(eppn, entitlements)
+          session.rolesIds = roleIds
         }
 
-        boolean hasAccess = false
-
-        session?.roles?.each { role ->
-          if (accessService.hasAccess(role, controllerName)) {
-            hasAccess = true
-          }
-        }
+        boolean hasAccess = accessService.hasAccess(roleIds, controllerName)
 
         if (!hasAccess) {
-          //TODO: i18n
-          String msg = ""
-          if (session.roles?.size > 0) {
-            msg = "Access denied for user ${request?.eppn} with roles ${(session.roles.collect { it.displayName }.join(', '))} to $controllerName"
-          } else {
-            msg = "User ${request?.eppn} is lacking valid roles, current environment scope is $accessService.scopedEnvironment"
-          }
-          flash.error = msg
+          flash.error = "Access denied for user ${eppn}"
           redirect(accessService.redirect)
           return false
         }
