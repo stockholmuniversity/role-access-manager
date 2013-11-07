@@ -80,6 +80,8 @@ class AccessService {
   private Map parseUrn(String urn) {
     Map response = [:]
 
+    final String appName = grailsApplication.config.access.applicationName
+
     if (!urn.contains(AccessRole.BASE)) {
       log.info "urn: $urn does not contain $AccessRole.BASE, skipping."
       return null
@@ -93,12 +95,19 @@ class AccessService {
 
     String system = urnElements.pop()
 
-    if (system != grailsApplication.config.access.applicationName) {
+    if (system != appName) {
       /** Not an urn directed for this system */
+      log.error "urn: $urn is not directed at the current system with name $appName (config > access > env)"
       return null
     }
 
-    response.role   = urnElements.pop()
+    response.role = urnElements.pop()
+
+    if (!response.role) {
+      /** urn is missing role. */
+      log.error "urn: $urn is missing role, skipping."
+      return null
+    }
 
     response.scope = createScopeMapFromScope(urnElements)
 
@@ -147,14 +156,45 @@ class AccessService {
       return null
     }
 
-    List roles = []
+    List authorizedRoles = []
     for (entitlement in entitlements) {
       Map parsedUrn = parseUrn(entitlement)
+
       if (parsedUrn != null) {
-        roles << parsedUrn
+        findAuthorizedRoles(appName, parsedUrn)
       }
     }
 
-    return roles
+    /** TODO: Find matching system roles */
+
+
+
+    return []
   }
+
+  private findAuthorizedRoles(String appName, Map parsedUrn) {
+    List<AccessRole> systemRoles = AccessRole.findAllByUriLike("${AccessRole.BASE + appName + ":" + parsedUrn.role}%")
+
+    for (systemRole in systemRoles) {
+
+      Map parsedSystemRole = parseUrn(systemRole.uri)
+
+      // TODO: check role belonging..
+
+      boolean hasRole = true
+
+      for (String scopeKey in parsedSystemRole.scope.keySet()) {
+        if (!parsedUrn.containsKey(scopeKey)) {
+          // No matching key in the parsed urn means the restriction does not apply to the current user.
+          continue
+        }
+
+
+
+      }
+
+    }
+
+  }
+
 }

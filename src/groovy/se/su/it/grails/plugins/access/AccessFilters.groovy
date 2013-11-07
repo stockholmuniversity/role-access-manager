@@ -37,6 +37,7 @@ class AccessFilters {
         boolean hasAccess = false
 
         session?.roles?.each { role ->
+          /** TODO: implement scope */
           if (accessService.hasAccess(role, controllerName)) {
             hasAccess = true
           }

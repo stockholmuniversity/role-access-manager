@@ -1,11 +1,13 @@
 package se.su.it.grails.plugins.access
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import spock.lang.Unroll
 
 @TestFor(AccessService)
+@Mock([AccessRole])
 class AccessServiceSpec extends Specification {
 
   def "parseUrn: invalid urn"() {
@@ -42,7 +44,7 @@ class AccessServiceSpec extends Specification {
     expect:
     result == service.createScopeMapFromScope("urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1".split(":") as List)
   }
-  // @IgnoreRest
+
   def "getRoles"() {
     given:
     service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
@@ -50,5 +52,13 @@ class AccessServiceSpec extends Specification {
 
     expect:
     expected == service.getRoles("eppn", ["urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1"])
+  }
+  @IgnoreRest
+  def "findAuthorizedRoles"() {
+    given:
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1").save()
+
+    expect:
+    service.findAuthorizedRoles("signuptool", [role:"sysadmin"]).size() == 1
   }
 }
