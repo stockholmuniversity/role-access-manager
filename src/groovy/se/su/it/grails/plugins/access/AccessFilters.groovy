@@ -28,41 +28,10 @@ class AccessFilters {
           return true
         }
 
-        if (session?.roles == null) {
-          //TODO: Get stuff from config
-          def entitlements = request.getAttribute("entitlement")?.split(";")
-
-          String scopedEnvironment = accessService.scopedEnvironment
-          final String appName = grailsApplication.config.access.applicationName
-
-
-          log.info "${request?.eppn} has the following entitlements."
-          entitlements.eachWithIndex { entitlement, index ->
-            log.info "${index}. $entitlement"
-          }
-
-          /** Remove all entitlements that do not correspond to the current application scope. */
-          entitlements = entitlements.grep { String entitlement ->
-            entitlement.contains(appName) && entitlement.contains(scopedEnvironment)
-          }
-
-          log.info "${request?.eppn} will use the following entitlements."
-          entitlements.eachWithIndex { entitlement, index ->
-            log.info "${index}. $entitlement"
-          }
-
-          if (!entitlements) {
-            log.error "No valid entitlements found."
-            return false
-          }
-
-          List roles = AccessRole.withCriteria {
-            'in'('uri', (String[]) entitlements)
-          }
-
-          session.roles = roles
-
-          log.info "roles: ${session.roles?.join(', ')}"
+        if (!session.roles) {
+          String eppn = request.eppn
+          List entitlements = request.getAttribute("entitlement")?.split(";")
+          session.roles = accessService.getRoles(eppn, entitlements)
         }
 
         boolean hasAccess = false

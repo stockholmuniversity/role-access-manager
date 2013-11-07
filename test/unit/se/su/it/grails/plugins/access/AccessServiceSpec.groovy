@@ -15,26 +15,40 @@ class AccessServiceSpec extends Specification {
 
   @Unroll
   def "parseUrn: Parsing urn #urn"() {
+    given:
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
+
     expect:
     result == service.parseUrn(urn)
 
     where:
     urn                                                                                   | result
+    "urn:mace:swami.se:gmai:vfu:sysadmin"                                                 | null
     "urn:mace:swami.se:gmai:signuptool:sysadmin"                                          |
-        [system:'signuptool', role:'sysadmin', scope:[:]]
+        [role:'sysadmin', scope:[:]]
     "urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev"                                  |
-        [system:'signuptool', role:'sysadmin', scope:[env:new TreeSet(["dev"])]]
+        [role:'sysadmin', scope:[env:new TreeSet(["dev"])]]
     "urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod"                         |
-        [system:'signuptool', role:'sysadmin', scope:[env:new TreeSet(["dev", "prod"])]]
+        [role:'sysadmin', scope:[env:new TreeSet(["dev", "prod"])]]
     "urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1" |
-        [system:"signuptool", role:"sysadmin", scope:[box:new TreeSet(["1"]), dept:new TreeSet(["221", "501"]), env:new TreeSet(["dev", "prod"])]]
+        [role:"sysadmin", scope:[box:new TreeSet(["1"]), dept:new TreeSet(["221", "501"]), env:new TreeSet(["dev", "prod"])]]
   }
 
   def "createScopeMapFromScopeList"() {
     given:
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
     Map result = new TreeMap([box:new TreeSet(["1"]), dept:new TreeSet(["221", "501"]), env:new TreeSet(["dev", "prod"])])
 
     expect:
     result == service.createScopeMapFromScope("urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1".split(":") as List)
+  }
+  // @IgnoreRest
+  def "getRoles"() {
+    given:
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
+    def expected = [[role:"sysadmin", scope:[box:new TreeSet(["1"]), dept:new TreeSet(["221", "501"]), env:new TreeSet(["dev", "prod"])]]]
+
+    expect:
+    expected == service.getRoles("eppn", ["urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1"])
   }
 }

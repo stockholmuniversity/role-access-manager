@@ -77,7 +77,7 @@ class AccessService {
     (grailsApplication.config.access.env)?:'dev'
   }
 
-  public Map parseUrn(String urn) {
+  private Map parseUrn(String urn) {
     Map response = [:]
 
     if (!urn.contains(AccessRole.BASE)) {
@@ -91,7 +91,13 @@ class AccessService {
     List urnElements = urn.split(":").reverse()
 
 
-    response.system = urnElements.pop()
+    String system = urnElements.pop()
+
+    if (system != grailsApplication.config.access.applicationName) {
+      /** Not an urn directed for this system */
+      return null
+    }
+
     response.role   = urnElements.pop()
 
     response.scope = createScopeMapFromScope(urnElements)
@@ -115,5 +121,40 @@ class AccessService {
       }
     }
     return scopeMap
+  }
+
+  public List getRoles(String eppn, List<String> entitlements) {
+
+    final String appName = grailsApplication.config.access.applicationName
+
+    log.info "${eppn} has the following entitlements."
+    entitlements.eachWithIndex { entitlement, index ->
+      log.info "${index}. \t $entitlement"
+    }
+
+    /** Remove all entitlements that do not correspond to the current application scope. */
+    entitlements = entitlements.grep { String entitlement ->
+      entitlement?.contains(appName)
+    }
+
+    log.info "${eppn} will use the following entitlements."
+    entitlements.eachWithIndex { entitlement, index ->
+      log.info "${index}. \t $entitlement"
+    }
+
+    if (!entitlements) {
+      log.error "No valid entitlements found."
+      return null
+    }
+
+    List roles = []
+    for (entitlement in entitlements) {
+      Map parsedUrn = parseUrn(entitlement)
+      if (parsedUrn != null) {
+        roles << parsedUrn
+      }
+    }
+
+    return roles
   }
 }
