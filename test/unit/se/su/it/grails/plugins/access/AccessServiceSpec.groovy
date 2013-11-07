@@ -56,9 +56,28 @@ class AccessServiceSpec extends Specification {
   @IgnoreRest
   def "findAuthorizedRoles"() {
     given:
-    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1").save()
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
+    // Unscoped sysadmin
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin").save()
+    // wrong env
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev").save()
+    // wrong dept
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=prod:dept=501").save()
+    // holds correct env
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod").save()
+    // holds correct env and dept
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=400").save()
+    // holds correct env and dept
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=400:box=4").save()
 
     expect:
-    service.findAuthorizedRoles("signuptool", [role:"sysadmin"]).size() == 1
+    service.findAuthorizedRoles("signuptool",
+        [role:"sysadmin",
+            scope:[
+              env:["prod"],
+              dept:["400"]
+            ]
+        ]
+    ) == [1, 4, 5, 6]
   }
 }

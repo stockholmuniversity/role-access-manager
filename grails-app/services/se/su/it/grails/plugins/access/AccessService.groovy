@@ -4,21 +4,23 @@ class AccessService {
 
   def grailsApplication
 
-  public hasAccess(AccessRole role, String controller) {
-    RoleControllerAccess roleControllerAccess = RoleControllerAccess.findByController controller
-
-    roleControllerAccess?.roles?.contains(role) ?: false
+  public boolean hasAccess(AccessRole role, String controller) {
+    hasAccess([role], controller)
   }
 
-  public hasAccess(Collection<AccessRole> roles, String controller) {
-    boolean access = false
+  public boolean hasAccess(Collection<AccessRole> myRoles, String myController) {
+    boolean hasAccess = false
 
-    roles.each { role ->
-      if ( hasAccess(role, controller) )
-        access = true
+    for (role in myRoles) {
+      if (RoleControllerAccess.where {
+        controller == myController && roles.contains(role)
+      }.count()) {
+        hasAccess = true
+        break
+      }
     }
 
-    access
+    return hasAccess
   }
 
   public addAccess(AccessRole role, String controller) {
@@ -90,10 +92,10 @@ class AccessService {
     urn = urn - AccessRole.BASE
 
     /** Split and turn the list around so we can pop! */
-    List urnElements = urn.split(":").reverse()
+    List urnElements = urn?.split(":")?.reverse()
 
 
-    String system = urnElements.pop()
+    String system = urnElements?.pop()
 
     if (system != appName) {
       /** Not an urn directed for this system */
@@ -101,7 +103,7 @@ class AccessService {
       return null
     }
 
-    response.role = urnElements.pop()
+    response.role = urnElements?.pop()
 
     if (!response.role) {
       /** urn is missing role. */
@@ -132,69 +134,81 @@ class AccessService {
     return scopeMap
   }
 
-  public List getRoles(String eppn, List<String> entitlements) {
+  public Set getUserRolesIds(String eppn, List<String> entitlements) {
 
     final String appName = grailsApplication.config.access.applicationName
 
-    log.info "${eppn} has the following entitlements."
+    log.debug "${eppn} has the following entitlements."
     entitlements.eachWithIndex { entitlement, index ->
-      log.info "${index}. \t $entitlement"
+      log.debug "${index}. \t $entitlement"
     }
 
     /** Remove all entitlements that do not correspond to the current application scope. */
     entitlements = entitlements.grep { String entitlement ->
-      entitlement?.contains(appName)
+      entitlement?.contains("${AccessRole.BASE + appName}:")
     }
 
-    log.info "${eppn} will use the following entitlements."
+    log.debug "${eppn} will use the following entitlements."
     entitlements.eachWithIndex { entitlement, index ->
-      log.info "${index}. \t $entitlement"
+      log.debug "${index}. \t $entitlement"
     }
 
     if (!entitlements) {
-      log.error "No valid entitlements found."
+      log.error "No valid entitlements found found for $eppn."
       return null
     }
 
-    List authorizedRoles = []
+    Set userRoleIds = []
+
     for (entitlement in entitlements) {
       Map parsedUrn = parseUrn(entitlement)
 
       if (parsedUrn != null) {
-        findAuthorizedRoles(appName, parsedUrn)
+        userRoleIds << findAuthorizedRoleIds(appName, parsedUrn)
       }
     }
 
-    /** TODO: Find matching system roles */
-
-
-
-    return []
+    return userRoleIds?.flatten()
   }
 
-  private findAuthorizedRoles(String appName, Map parsedUrn) {
+  private List<Long> findAuthorizedRoleIds(String appName, Map parsedUrn) {
+    List roles = []
+
     List<AccessRole> systemRoles = AccessRole.findAllByUriLike("${AccessRole.BASE + appName + ":" + parsedUrn.role}%")
+
+    if (!parsedUrn) {
+      return null
+    }
 
     for (systemRole in systemRoles) {
 
       Map parsedSystemRole = parseUrn(systemRole.uri)
 
-      // TODO: check role belonging..
+      if (!parsedSystemRole) {
+        /* Skipping null roles */
+        continue
+      }
 
       boolean hasRole = true
 
       for (String scopeKey in parsedSystemRole.scope.keySet()) {
-        if (!parsedUrn.containsKey(scopeKey)) {
-          // No matching key in the parsed urn means the restriction does not apply to the current user.
+        if (!parsedUrn?.scope?.containsKey(scopeKey)) {
+          /* No matching key in the parsed urn means the restriction does not apply to the current user. */
           continue
         }
 
-
-
+        /* If there is no correlation disjoint returns true, then we don't have the specified role. */
+        if (Collections.disjoint((TreeSet) parsedUrn.scope[scopeKey], (TreeSet) parsedSystemRole.scope[scopeKey])) {
+          hasRole = false
+          break
+        }
       }
 
+      if (hasRole) {
+        roles << systemRole.id
+      }
     }
 
+    return roles
   }
-
 }

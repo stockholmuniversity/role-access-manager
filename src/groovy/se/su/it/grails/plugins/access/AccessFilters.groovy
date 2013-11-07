@@ -28,30 +28,25 @@ class AccessFilters {
           return true
         }
 
-        if (!session.roles) {
-          String eppn = request.eppn
+        String eppn = request.eppn
+        Set roleIds = session.rolesIds
+
+        if (!roleIds) {
           List entitlements = request.getAttribute("entitlement")?.split(";")
-          session.roles = accessService.getRoles(eppn, entitlements)
+          roleIds = accessService.getUserRolesIds(eppn, entitlements)
+          session.rolesIds = roleIds
         }
 
-        boolean hasAccess = false
+        List roles = []
 
-        session?.roles?.each { role ->
-          /** TODO: implement scope */
-          if (accessService.hasAccess(role, controllerName)) {
-            hasAccess = true
-          }
+        for (id in roleIds) {
+          roles << AccessRole.read(id as Long)
         }
+
+        boolean hasAccess = accessService.hasAccess(roles, controllerName)
 
         if (!hasAccess) {
-          //TODO: i18n
-          String msg = ""
-          if (session.roles?.size > 0) {
-            msg = "Access denied for user ${request?.eppn} with roles ${(session.roles.collect { it.displayName }.join(', '))} to $controllerName"
-          } else {
-            msg = "User ${request?.eppn} is lacking valid roles, current environment scope is $accessService.scopedEnvironment"
-          }
-          flash.error = msg
+          flash.error = "Access denied for user ${eppn}"
           redirect(accessService.redirect)
           return false
         }
