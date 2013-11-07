@@ -76,4 +76,44 @@ class AccessService {
   public String getScopedEnvironment() {
     (grailsApplication.config.access.env)?:'dev'
   }
+
+  public Map parseUrn(String urn) {
+    Map response = [:]
+
+    if (!urn.contains(AccessRole.BASE)) {
+      log.info "urn: $urn does not contain $AccessRole.BASE, skipping."
+      return null
+    }
+
+    urn = urn - AccessRole.BASE
+
+    /** Split and turn the list around so we can pop! */
+    List urnElements = urn.split(":").reverse()
+
+
+    response.system = urnElements.pop()
+    response.role   = urnElements.pop()
+
+    response.scope = createScopeMapFromScope(urnElements)
+
+    return response
+  }
+
+  private static Map createScopeMapFromScope(List urn) {
+    String[] scope = urn.grep { it.contains("=") }
+
+    Map scopeMap = new TreeMap() // We want a sortedMap.
+    for (String scopeEntry in scope) {
+      List keyVal = scopeEntry.split("=")
+      String key = keyVal[0]
+      String val = keyVal[1]
+
+      if (scopeMap.containsKey(key)) {
+        scopeMap[key] << val
+      } else {
+        scopeMap[key] = new TreeSet([val])
+      }
+    }
+    return scopeMap
+  }
 }

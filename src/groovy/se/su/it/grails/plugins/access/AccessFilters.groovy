@@ -1,9 +1,12 @@
 package se.su.it.grails.plugins.access
 
 import grails.util.Environment
+import groovy.util.logging.Slf4j
 
+@Slf4j
 class AccessFilters {
 
+  def grailsApplication
   def accessService
 
   def filters = {
@@ -11,8 +14,11 @@ class AccessFilters {
     all(controller: '*', action: '*') {
       before = {
 
-        /** Add development mode. */
-        if (Environment.current == Environment.DEVELOPMENT && !(request?.eppn)) {
+        /** Add development & mock mode shibboleth bypass. */
+        if (
+            Environment.current.name in [Environment.DEVELOPMENT.name, "mock"]
+                && !(request?.eppn)) {
+          log.info "Missing eppn but environment $Environment.current.name allows shibboleth bypass, returning true."
           return true
         }
 
@@ -27,38 +33,36 @@ class AccessFilters {
           def entitlements = request.getAttribute("entitlement")?.split(";")
 
           String scopedEnvironment = accessService.scopedEnvironment
+          final String appName = grailsApplication.config.access.applicationName
+
+
+          log.info "${request?.eppn} has the following entitlements."
+          entitlements.eachWithIndex { entitlement, index ->
+            log.info "${index}. $entitlement"
+          }
 
           /** Remove all entitlements that do not correspond to the current application scope. */
-          def scopedEntitlements = entitlements.grep { String entitlement ->
-            entitlement ==~ /.*[,|:]env=${scopedEnvironment}.*/
+          entitlements = entitlements.grep { String entitlement ->
+            entitlement.contains(appName) && entitlement.contains(scopedEnvironment)
+          }
+
+          log.info "${request?.eppn} will use the following entitlements."
+          entitlements.eachWithIndex { entitlement, index ->
+            log.info "${index}. $entitlement"
           }
 
           if (!entitlements) {
-            log.error "No valid entitlements found for scoped environment ${scopedEnvironment}"
-            log.info "${request?.eppn} has the following entitlements."
-            entitlements.eachWithIndex { entitlement, index ->
-              log.info "${index}. $entitlement"
-            }
+            log.error "No valid entitlements found."
+            return false
           }
 
-          session?.roles = scopedEntitlements?.collect { String entitlement ->
-            try {
-
-              String base = AccessRole.getBaseFromUri(entitlement)
-              String env = AccessRole.getEnvFromUri(entitlement)
-
-              if (env != scopedEnvironment) {
-                log.debug "Environment is $env and scoped environment (set through config is $scopedEnvironment, skipping"
-                return null
-              }
-
-              return AccessRole.findByBaseAndEnv(base, env)
-            } catch (ex) {
-              log.error "Failed to parse ${entitlement}", ex
-              return null
-            }
+          List roles = AccessRole.withCriteria {
+            'in'('uri', (String[]) entitlements)
           }
-          session?.roles?.removeAll { it == null }
+
+          session.roles = roles
+
+          log.info "roles: ${session.roles?.join(', ')}"
         }
 
         boolean hasAccess = false

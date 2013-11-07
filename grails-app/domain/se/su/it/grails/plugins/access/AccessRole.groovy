@@ -8,7 +8,7 @@ class AccessRole {
   String displayName
   String uri
 
-  private final static String BASE = "urn:mace:swami.se:gmai:"
+  public final static String BASE = "urn:mace:swami.se:gmai:"
 
   static mapping = {
     cache true
