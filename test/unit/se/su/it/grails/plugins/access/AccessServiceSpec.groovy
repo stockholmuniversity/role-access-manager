@@ -7,8 +7,33 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 @TestFor(AccessService)
-@Mock([AccessRole])
+@Mock([AccessRole, RoleControllerAccess])
 class AccessServiceSpec extends Specification {
+
+  @Unroll
+  def "hasAccess: With single role querying for #controllerName expecting #expected"() {
+    given:
+    AccessRole accessRole = new AccessRole(displayName: 'displayName', uri:'uri').save()
+    new RoleControllerAccess(controller: 'controller', roles:[accessRole]).save()
+
+    expect:
+    expected == service.hasAccess(accessRole.id, controllerName)
+
+    where:
+    controllerName      | expected
+    "controller"        | true
+    "fooController"     | false
+  }
+
+  def "hasAccess: With multiple roles, querying for #controllerName expecting #expected"() {
+    given:
+    AccessRole accessRole1 = new AccessRole(displayName: 'displayName', uri:'uri').save()
+    AccessRole accessRole2 = new AccessRole(displayName: 'displayName', uri:'uri').save()
+    new RoleControllerAccess(controller: 'controller', roles:[accessRole2]).save()
+
+    expect:
+    service.hasAccess([accessRole1.id, accessRole2.id], "controller")
+  }
 
   def "parseUrn: invalid urn"() {
     expect:
@@ -45,15 +70,44 @@ class AccessServiceSpec extends Specification {
     result == service.createScopeMapFromScope("urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1".split(":") as List)
   }
 
-  def "getRoles"() {
+  def "parseUrn: urn without role returns"() {
     given:
     service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
-    def expected = [[role:"sysadmin", scope:[box:new TreeSet(["1"]), dept:new TreeSet(["221", "501"]), env:new TreeSet(["dev", "prod"])]]]
 
     expect:
-    expected == service.getRoles("eppn", ["urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=221:box=1"])
+    null == service.parseUrn("urn:mace:swami.se:gmai:signuptool::env=dev:env=prod:dept=501:dept=221:box=1")
   }
-  @IgnoreRest
+
+  def "getUserRolesIds: with no valid entitlements"() {
+    given:
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
+
+    expect:
+    null == service.getUserRolesIds("eppn", ["urn:mace:swami.se:gmai:vfu:sysadmin"])
+  }
+
+  def "findAuthorizedRoleIds: when supplied parsed urn is empty"() {
+    expect:
+    null == service.findAuthorizedRoleIds("appName", null)
+  }
+
+  def "getUserRolesIds"() {
+    given:
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=221:dept=501:box=1").save()
+    // shouldn't be found since env does not match.
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=prod:dept=221").save()
+
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev").save()
+
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin").save()
+
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
+    Set expected = [1, 3, 4]
+
+    expect:
+    expected == service.getUserRolesIds("eppn", ["urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev"])
+  }
+
   def "findAuthorizedRoles"() {
     given:
     service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
@@ -71,7 +125,7 @@ class AccessServiceSpec extends Specification {
     new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev:env=prod:dept=501:dept=400:box=4").save()
 
     expect:
-    service.findAuthorizedRoles("signuptool",
+    service.findAuthorizedRoleIds("signuptool",
         [role:"sysadmin",
             scope:[
               env:["prod"],
@@ -79,5 +133,18 @@ class AccessServiceSpec extends Specification {
             ]
         ]
     ) == [1, 4, 5, 6]
+  }
+
+  def "findAuthorizedRoles: with multiple scope attrs"() {
+    given:
+    service.grailsApplication = [config:[access:[applicationName:"signuptool"]]]
+    /* Should find this attr */
+    new AccessRole(displayName: "Sysadmin", uri:"urn:mace:swami.se:gmai:signuptool:sysadmin:env=dev").save()
+
+    expect:
+    service.findAuthorizedRoleIds("signuptool", [
+        role:"sysadmin",
+        scope:[env:["prod", "dev"], dept:["400"]]
+    ])?.size() == 1
   }
 }

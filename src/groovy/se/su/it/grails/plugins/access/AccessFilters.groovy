@@ -37,13 +37,7 @@ class AccessFilters {
           session.rolesIds = roleIds
         }
 
-        List roles = []
-
-        for (id in roleIds) {
-          roles << AccessRole.read(id as Long)
-        }
-
-        boolean hasAccess = accessService.hasAccess(roles, controllerName)
+        boolean hasAccess = accessService.hasAccess(roleIds, controllerName)
 
         if (!hasAccess) {
           flash.error = "Access denied for user ${eppn}"

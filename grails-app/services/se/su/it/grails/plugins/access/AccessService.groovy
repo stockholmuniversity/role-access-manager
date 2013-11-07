@@ -4,12 +4,14 @@ class AccessService {
 
   def grailsApplication
 
-  public boolean hasAccess(AccessRole role, String controller) {
-    hasAccess([role], controller)
+  public boolean hasAccess(Long id, String controller) {
+    hasAccess([id], controller)
   }
 
-  public boolean hasAccess(Collection<AccessRole> myRoles, String myController) {
+  public boolean hasAccess(Collection<? extends Number> ids, String myController) {
     boolean hasAccess = false
+
+    List myRoles = AccessRole.findAllByIdInList(ids?.toList())
 
     for (role in myRoles) {
       if (RoleControllerAccess.where {
@@ -73,10 +75,6 @@ class AccessService {
 
   public LinkedHashMap<String, String> getRedirect() {
     grailsApplication.config.access.redirect ?: [uri: '/']
-  }
-
-  public String getScopedEnvironment() {
-    (grailsApplication.config.access.env)?:'dev'
   }
 
   private Map parseUrn(String urn) {
@@ -172,13 +170,14 @@ class AccessService {
   }
 
   private List<Long> findAuthorizedRoleIds(String appName, Map parsedUrn) {
-    List roles = []
-
-    List<AccessRole> systemRoles = AccessRole.findAllByUriLike("${AccessRole.BASE + appName + ":" + parsedUrn.role}%")
 
     if (!parsedUrn) {
       return null
     }
+
+    List roles = []
+
+    List<AccessRole> systemRoles = AccessRole.findAllByUriLike("${AccessRole.BASE + appName + ":" + parsedUrn.role}%")
 
     for (systemRole in systemRoles) {
 
