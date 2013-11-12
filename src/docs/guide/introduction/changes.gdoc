@@ -1,3 +1,9 @@
+h3. v0.3.2 - November 12th. 2013
+  * Bugfix in the TagLib
+
+h3. v0.3.0 - Autumn 2013
+  * Added scope support
+
 h3. v0.2.6 - June 14th 2013
   * Added environment scope handling.
 
