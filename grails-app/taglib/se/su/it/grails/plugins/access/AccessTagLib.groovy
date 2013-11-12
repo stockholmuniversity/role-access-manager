@@ -9,7 +9,7 @@ class AccessTagLib {
 
   def hasAccess = { attrs, body ->
     String controller = attrs?.controller ?: null
-    if (accessService.hasAccess(session.rolesIds as List<Long>, controller as String))
+    if (accessService.hasAccess(session.roleIds as List<Long>, controller as String))
       out << body()
   }
 
