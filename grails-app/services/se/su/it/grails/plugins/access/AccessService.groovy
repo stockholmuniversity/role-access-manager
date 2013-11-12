@@ -11,12 +11,8 @@ class AccessService {
   public boolean hasAccess(Collection<? extends Number> ids, String myController) {
     boolean hasAccess = false
 
-    List myRoles = AccessRole.findAllByIdInList(ids?.toList())
-
-    for (role in myRoles) {
-      if (RoleControllerAccess.where {
-        controller == myController && roles.contains(role)
-      }.count()) {
+    for (roleId in ids?.toList()) {
+      if (RoleControllerAccess.accessByControllerAndRoleId(myController, roleId as Long).count()) {
         hasAccess = true
         break
       }

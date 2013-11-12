@@ -16,10 +16,10 @@ class AccessTagLib {
   def renderAccessMatrix = { attrs ->
     String controller = attrs?.controller ?: null
     AccessRole role = AccessRole.get(attrs?.role as long)
-    
+
     def systemRole = RoleControllerAccess.findByController(controller)
     List<String> disabledControllers = grailsApplication.config.access.disabledInDynamicAccess ?: []
-    
+
     if (role && controller) {
       def key = controller
       def val = systemRole?.roles?.contains(role) ?: false

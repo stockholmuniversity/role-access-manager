@@ -29,12 +29,12 @@ class AccessFilters {
         }
 
         String eppn = request.eppn
-        Set roleIds = session.rolesIds
+        Set roleIds = session.roleIds
 
         if (!roleIds) {
           List entitlements = request.getAttribute("entitlement")?.split(";")
           roleIds = accessService.getUserRolesIds(eppn, entitlements)
-          session.rolesIds = roleIds
+          session.roleIds = roleIds
         }
 
         boolean hasAccess = accessService.hasAccess(roleIds, controllerName)
