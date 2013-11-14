@@ -1,6 +1,7 @@
 An example configuration could look like this:
 {code}
 access {
+  disabled = false
   env = 'dev'
   redirect = [controller: 'dashboard']
   unprotected = ['dashboard']
@@ -21,3 +22,6 @@ A list of controllers with unrestricted access.
 
 h3. Controllers disabled in dynamic access view
 A list of controllers that should be disabled in the dynamic access view.
+
+h3. Disabling the plugin
+The 'disabled' config option will disable access checking and let anything trough

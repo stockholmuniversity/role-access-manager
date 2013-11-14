@@ -1,3 +1,6 @@
+h3. v0.4.0 - November 14th. 2013
+  * Replaced env based disabled checking with config option
+
 h3. v0.3.3 - November 12th. 2013
   * Bugfix in the TagLib
   * Bugfix for faulty query allowing anything

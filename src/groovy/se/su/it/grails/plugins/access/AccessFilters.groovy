@@ -1,6 +1,5 @@
 package se.su.it.grails.plugins.access
 
-import grails.util.Environment
 import groovy.util.logging.Slf4j
 
 @Slf4j
@@ -14,11 +13,9 @@ class AccessFilters {
     all(controller: '*', action: '*') {
       before = {
 
-        /** Add development & mock mode shibboleth bypass. */
-        if (
-            Environment.current.name in [Environment.DEVELOPMENT.name, "mock"]
-                && !(request?.eppn)) {
-          log.info "Missing eppn but environment $Environment.current.name allows shibboleth bypass, returning true."
+        /** If plugin is disabled, allow shibboleth bypass. */
+        if (grailsApplication?.config?.access?.disabled == true) {
+          log.info "Access disabled (access.disabled = true), allowing anything to pass."
           return true
         }
 
