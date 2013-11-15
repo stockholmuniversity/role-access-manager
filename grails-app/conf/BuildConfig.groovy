@@ -16,6 +16,7 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
+      mavenRepo "http://maven.it.su.se/it.su.se/maven2/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -24,8 +25,11 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+        build 'se.su.it.grails.plugins:grails-sonar-pom:0.0.4'
         build ':release:3.0.0', ':rest-client-builder:1.0.3', {
           export = false
         }
+
+      test ":code-coverage:1.2.6"
     }
 }
